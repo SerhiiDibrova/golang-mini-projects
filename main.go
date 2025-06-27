@@ -1,29 +1,80 @@
 package main
 
 import (
-	"fmt"
+	"database/sql"
+	"encoding/json"
 	"log"
+	"net/http"
 	"os"
 
-	"github.com/akilans/fiber-book-rest/routes"
-	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
-// Main function
+type CssHandler struct{}
+
+func (h *CssHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("CssHandler"))
+}
+
+type Filters struct {
+	Server string `json:"server"`
+	Layer  string `json:"layer"`
+}
+
+func getFilters(w http.ResponseWriter, r *http.Request) {
+	filters := Filters{
+		Server: "server1",
+		Layer:  "layer1",
+	}
+	json.NewEncoder(w).Encode(filters)
+}
+
+func getLayerInfoJson(w http.ResponseWriter, r *http.Request) {
+	layerInfo := map[string]string{
+		"layer": "layer1",
+	}
+	json.NewEncoder(w).Encode(layerInfo)
+}
+
+func BeforeInterceptor(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("BeforeInterceptor")
+		next.ServeHTTP(w, r)
+	})
+}
+
+func connectToDatabase() (*sql.DB, error) {
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+
+	dbString := "host=" + dbHost + " port=" + dbPort + " user=" + dbUser + " password=" + dbPassword + " dbname=" + dbName + " sslmode=disable"
+
+	return sql.Open("postgres", dbString)
+}
+
 func main() {
-	fmt.Println("Bookstore REST API with MySQL, GORM, JWT, and Fiber")
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
-	// Refer init function defined in models/booksModel.go
-	// That loads env, Connects to DB and migrate tables
+	cssHandler := &CssHandler{}
 
-	// setup app
-	app := fiber.New()
+	http.Handle("/css", cssHandler)
+	http.HandleFunc("/getFilters", getFilters)
+	http.HandleFunc("/getLayerInfoJson", getLayerInfoJson)
 
-	// router config
-	routes.Routes(app)
+	db, err := connectToDatabase()
+	if err != nil {
+		log.Fatal("Error connecting to database: ", err)
+	}
+	defer db.Close()
 
-	PORT := os.Getenv("PORT")
-	log.Println("Server started on port - ", PORT)
-	// start app
-	log.Fatal(app.Listen(PORT))
+	log.Println("Database connection established")
+
+	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), BeforeInterceptor(http.DefaultServeMux)))
 }
