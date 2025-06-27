@@ -1,56 +1,61 @@
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fakilans%2Fgolang-mini-projects&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fakilans%2Fgolang-mini-projects%2Ftree%2Fmain%2F12-fiber-book-rest&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
-# Golang Mini Projects for Beginners
+# Bookstore REST API with MySQL, GORM, JWT and Fiber framework
 
-Here is the collection of beginner friendly golang projects
+- This is REST based API to list, add, update and delete books
 
-### Mini Projects
+### Tools and Packages
 
-- [Book Store cli app to list, add, update, delete books](https://github.com/akilans/golang-mini-projects/tree/main/01-bookstore-cli-flag-json)
+- Fiber - Golang web Framework
+- MySql - SQL Database
+- Gorm - ORM library for golang
+- JWT - For Authorization
+- Bycrypt - To hash passwords
 
-- [Organize folder based on file extensions](https://github.com/akilans/golang-mini-projects/tree/main/02-organize-folder)
+### Prerequisites
 
-- [Website Monitoring and Alerting using Golang](https://github.com/akilans/golang-mini-projects/tree/main/03-web-monitor)
+- Golang
+- Mysql
 
-- [Bookstore rest API to list, add, update, delete books](https://github.com/akilans/golang-mini-projects/tree/main/04-bookstore-api)
+```bash
+# I used docker to run mysql
+docker container run --name mysql -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root#123 mysql
+docker exec -it mysql bash
+mysql -u root -p
+Enter password: root#123
+mysql> CREATE DATABASE bookstore;
+```
 
-- [Random password generator](https://github.com/akilans/golang-mini-projects/tree/main/05-random-password)
+- Update .env file with correct information
 
-- [System Metrics API](https://github.com/akilans/golang-mini-projects/tree/main/06-system-monitor)
+```bash
+DB_DSN="root:root#123@tcp(127.0.0.1:3306)/bookstore?charset=utf8mb4&parseTime=True&loc=Local"
+PORT=":8080"
+SECRET_KEY="mysecret"
+```
 
-- [SSH and SFTP](https://github.com/akilans/golang-mini-projects/tree/main/07-ssh-sftp-agent)
+### Run the application
 
-- [Folders, Files & Zip](https://github.com/akilans/golang-mini-projects/tree/main/08-file-folder-zip)
+```bash
+go run main.go
+```
 
-- [Package and Module demo](https://github.com/akilans/golang-mini-projects/tree/main/09-pack-mod-demo)
+### URL endpoints
 
-- [Concurrent File Uploader](https://github.com/akilans/golang-mini-projects/tree/main/10-golang-ssh-concurrent-file-uploder)
+- Users
+  - `POST` - Register - /admin
+  - `POST` - Login - /login
+- Books - JWT token needs to be passed in header
+  - `GET` - Get all the books - `/`
+  - `GET` - Get book by id - `/book/{id}`
+  - `DELETE` - Delete book by id - `/book/{id}`
+  - `POST` - Add a book - `/addbook`
+  - `PUT` - Update book - `/book/{id}`
 
-- [Golang REST API with JWT auth](https://github.com/akilans/golang-mini-projects/tree/main/11-jwt-golang)
+### Postman setup for testing
 
-- [Bookstore rest API with Fiber, Gorm, MySQL, JWT](https://github.com/akilans/golang-mini-projects/tree/main/12-fiber-book-rest)
+- Import `fiber-rest-book.postman_collection.json` and start testing
 
-- [Kubernetes Client-go example](https://github.com/akilans/golang-mini-projects/tree/main/13-k8s-client-go)
+### Demo
 
-- [Akit-Ops - simple GitOps solution](https://github.com/akilans/golang-mini-projects/tree/main/14_akit-ops)
-
-## Credits and references
-
-1. [That DevOps Guy](https://www.youtube.com/c/MarcelDempers)
-2. [Donald Feury](https://www.youtube.com/c/DonaldFeury)
-3. [Coding with Robby](https://www.youtube.com/@codingwithrobby)
-4. [Akhil Sharma](https://www.youtube.com/@AkhilSharmaTech)
-5. [NerdCademy](https://www.youtube.com/@NerdCademyDev)
-6. [Golang Dojo](https://www.youtube.com/@GolangDojo)
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-## Tools used
-
-- [Video - Openshot](https://www.openshot.org/)
-- [Gif - FFMPEG](https://www.ffmpeg.org/)
-- [Ubuntu OS](https://ubuntu.com/)
-- [VS code IDE](https://code.visualstudio.com/)
-- [Simple screen recorder](https://www.maartenbaert.be/simplescreenrecorder/)
+![Alt Bookstore API](https://raw.githubusercontent.com/akilans/golang-mini-projects/main/demos/fiber-book-rest.gif)
